@@ -1,0 +1,115 @@
+specVersion: 0.2.0
+name: zoombies-subquery
+version: 1.0.0
+description: Zoom Token mint, burn and approvals on Moonriver
+repository: https://github.com/ryanprice/zoombies-subquery
+schema:
+  file: ./schema.graphql
+network:
+  genesisHash: '0x401a1f9dca3da46f5c4091016c8a2f26dcea05865116b286f60f668207d1474b' # Genesis hash of Moonriver
+  endpoint: wss://moonriver.api.onfinality.io/public-ws
+  # Optionally provide the HTTP endpoint of a full chain dictionary to speed up processing
+  dictionary: 'https://api.subquery.network/sq/subquery/moonriver-dictionary'
+
+  chaintypes:
+    file: "./types.yaml"
+
+dataSources:
+  - kind: substrate/Moonbeam
+    startBlock: 442091 # startBlock number for Zoombies
+    processor:
+      file: './node_modules/@subql/contract-processors/dist/moonbeam.js'
+      options:
+        # Must be a key of assets
+        abi: Zoombies
+        ## The contract that emitted the event
+        address: '0x08716e418e68564c96b68192e985762740728018' # Zoombies contract address
+    assets:
+      Zoombies:
+        file: './abis/Zoombies.json'
+    mapping:
+      file: './dist/index.js'
+      handlers:
+        # LogCardTypeLoaded(uint32 indexed cardTypeId, string cardName, uint editionTotal)
+        - handler: handleLogCardTypeLoadedEvent
+          kind: substrate/MoonbeamEvent
+          filter:
+            topics:
+              - LogCardTypeLoaded(uint32 indexed cardTypeId, string cardName, uint editionTotal)
+        # LogCardMinted(address indexed buyer, uint tokenId, uint32 indexed cardTypeId, uint editionNumber)
+        - handler: handleLogCardMintedEvent
+          kind: substrate/MoonbeamEvent
+          filter:
+            topics:
+              - LogCardMinted(address indexed buyer, uint tokenId, uint32 indexed cardTypeId, uint editionNumber)
+        # LogPackOpened(address indexed buyer, uint8 rarity)
+        - handler: handleLogPackOpenedEvent
+          kind: substrate/MoonbeamEvent
+          filter:
+            topics:
+              - LogPackOpened(address indexed buyer, uint8 rarity)
+        # LogSponsorLinked(address sponsor, address affiliate)
+        - handler: handleLogSponsorLinkedEvent
+          kind: substrate/MoonbeamEvent
+          filter:
+            topics:
+              - LogSponsorLinked(address sponsor, address affiliate)
+        # LogSponsorReward(address sponsor, address affiliate, uint zoomReward)
+        - handler: handleLogSponsorRewardEvent
+          kind: substrate/MoonbeamEvent
+          filter:
+            topics:
+              - LogSponsorReward(address sponsor, address affiliate, uint zoomReward)
+        # LogDailyReward(address player, uint newBoosterBalance)
+        - handler: handleLogDailyRewardEvent
+          kind: substrate/MoonbeamEvent
+          filter:
+            topics:
+              - LogDailyReward(address player, uint newBoosterBalance)
+        # LogRewardBoosters(address winner, uint boostersAwarded)
+        - handler: handleLogRewardBoostersEvent
+          kind: substrate/MoonbeamEvent
+          filter:
+            topics:
+              - LogRewardBoosters(address winner, uint boostersAwarded)
+        # LogSacrificeNFT(address owner, uint256 tokenId, uint16 cardTypeId, uint256 zoomGained)
+        - handler: handleLogSacrificeNFTEvent
+          kind: substrate/MoonbeamEvent
+          filter:
+            topics:
+              - LogSacrificeNFT(address owner, uint256 tokenId, uint16 cardTypeId, uint256 zoomGained)
+        # - handler: handleMoonriverEvent
+        #   kind: substrate/MoonbeamEvent
+        #   filter:
+        #     ## Topics that follow Ethereum JSON-RPC log filters
+        #     ## https://docs.ethers.io/v5/concepts/events/
+        #     ## With a couple of added benefits:
+        #     ##  - Values don't need to be 0 padded
+        #     ##  - Event fragments can be provided and automatically converted to their id
+        #     topics:
+        #       ## Example valid values:
+        #       # - '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+        #       # - Transfer(address,address,u256)
+        #       # - Transfer(address from,address to,uint256 value)
+
+        #       ## Example of OR filter, will capture Transfer or Approval events
+        #       # - - 'Transfer(address indexed from,address indexed to,uint256 value)'
+        #       #   - 'Approval(address indexed owner, address indexed spender, uint256 value)'
+
+        #       - Transfer(address indexed from,address indexed to,uint256 value)
+
+        #       ## topics[1] to topics[3] are the indexed values
+        #       - null
+        #       - null
+        #       - null
+        # - handler: handleMoonriverCall
+        #   kind: substrate/MoonbeamCall
+        #   filter:
+        #     ## The function can either be the method fragment or signature
+        #     # function: '0x095ea7b3'
+        #     # function: '0x7ff36ab500000000000000000000000000000000000000000000000000000000'
+        #     # function: approve(address,uint256)
+        #     function: approve(address to,uint256 value)
+
+        #     ## The transaction sender
+        #     # from: '0x6bd193ee6d2104f14f94e2ca6efefae561a4334b'

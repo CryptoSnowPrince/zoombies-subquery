@@ -1,0 +1,91 @@
+# LogCardTypeLoaded(uint32 indexed cardTypeId, string cardName, uint editionTotal);
+
+type LogCardTypeLoaded @entity {
+	id: ID! # Transaction Hash
+
+  cardTypeId: BigInt!
+
+  cardName: String!
+
+  editionTotal: BigInt!
+}
+
+# LogCardMinted(address indexed buyer, uint tokenId, uint32 indexed cardTypeId, uint editionNumber);
+
+type LogCardMinted @entity {
+	id: ID! # Transaction Hash
+
+  buyer: String!
+
+  tokenId: BigInt!
+
+  cardTypeId: BigInt!
+
+  editionNumber: BigInt!
+}
+
+# LogPackOpened(address indexed buyer, uint8 rarity);
+
+type LogPackOpened @entity {
+	id: ID! # Transaction Hash
+
+  buyer: String!
+
+  rarity: BigInt!
+}
+
+# LogSponsorLinked(address sponsor, address affiliate);
+
+type LogSponsorLinked @entity {
+	id: ID! # Transaction Hash
+
+  sponsor: String!
+
+  affiliate: String!
+}
+
+# LogSponsorReward(address sponsor, address affiliate, uint zoomReward);
+
+type LogSponsorReward @entity {
+	id: ID! # Transaction Hash
+
+  sponsor: String!
+
+  affiliate: String!
+
+  zoomReward: BigInt!
+}
+
+# LogDailyReward(address player, uint newBoosterBalance);
+
+type LogDailyReward @entity {
+	id: ID! # Transaction Hash
+
+  player: String!
+
+  newBoosterBalance: BigInt!
+}
+
+# LogRewardBoosters(address winner, uint boostersAwarded);
+
+type LogRewardBoosters @entity {
+	id: ID! # Transaction Hash
+
+  winner: String!
+
+  boostersAwarded: BigInt!
+}
+
+# LogSacrificeNFT(address owner, uint256 tokenId, uint16 cardTypeId, uint256 zoomGained);
+
+type LogSacrificeNFT @entity {
+	id: ID! # Transaction Hash
+
+  owner: String!
+
+  tokenId: BigInt!
+
+  cardTypeId: BigInt!
+
+  zoomGained: BigInt!
+}
